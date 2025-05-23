@@ -10,7 +10,7 @@
 ## **Sockets e Streams**
 
 ### **1. Definição do Serviço Remoto**
-- Cada estudante deve definir um serviço remoto.  
+- Cada estudante deve definir um serviço remoto. ([sugestões](https://docs.google.com/document/d/195cAAxlmFoZ_mAgTuPGF7eD28e8-5zBA8_rSiGol59I/edit?tab=t.0))  
 - Criar pelo menos **classes POJO** que representem as informações do serviço escolhido.  
 - Implementar **2 classes de modelo** que representem serviços.  
 
