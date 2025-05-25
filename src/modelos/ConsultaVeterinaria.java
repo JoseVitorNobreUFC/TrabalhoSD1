@@ -1,5 +1,9 @@
 package modelos;
 
-public class ConsultaVeterinaria {
-  
+public class ConsultaVeterinaria extends ConsultaBase {
+
+
+  public ConsultaVeterinaria() {
+    super();
+  }
 }
