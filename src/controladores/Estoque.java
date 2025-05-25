@@ -26,6 +26,18 @@ public class Estoque {
         }
     }
 
+    public static String stringfy(Map<String, Integer> medicamentos) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : medicamentos.entrySet()) {
+            sb.append("  ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        }
+        return sb.toString();
+    }
+
+    public Map<String, Integer> getMedicamentos(String tipoAnimal) {
+        return medicamentosPorAnimal.get(tipoAnimal);
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
