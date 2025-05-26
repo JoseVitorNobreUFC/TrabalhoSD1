@@ -1,9 +1,28 @@
 package modelos;
 
-public class ConsultaVeterinaria extends ConsultaBase {
+import java.util.ArrayList;
 
+public class ConsultaVeterinaria extends ConsultaBase {
+  private ArrayList<String> veterinarios;
 
   public ConsultaVeterinaria() {
     super();
+    this.veterinarios = new ArrayList<>();
+  }
+
+  public ArrayList<String> getVeterinarios() {
+    return veterinarios;
+  }
+
+  public void adicionarVeterinario(String veterinario) {
+    veterinarios.add(veterinario);
+  }
+
+  public void removerVeterinario(int id) {
+    if (id < veterinarios.size() && id >= 0) {
+      veterinarios.remove(id);
+    } else {
+      throw new IllegalArgumentException("Veterinario " + id + " nao encontrado.");
+    }
   }
 }
