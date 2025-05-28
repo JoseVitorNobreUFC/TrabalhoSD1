@@ -16,7 +16,7 @@ public class AnimalOutputStream extends OutputStream  {
     }
 
     private void escreverAnimais(Animal[] animais, int numeroObjetos) throws IOException {
-        if(numeroObjetos < 0 || numeroObjetos > animais.length) {
+        if(numeroObjetos <= 0 || numeroObjetos > animais.length) {
             throw new IllegalArgumentException("Número de objetos inválido");
         }
 

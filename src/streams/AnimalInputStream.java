@@ -26,7 +26,7 @@ public class AnimalInputStream extends InputStream {
 
         try{
             totalBytes = dis.readInt();
-            animalData.put("Total de Bytes declarados", totalBytes);
+            animalData.put("totalBytesDeclarados", totalBytes);
         } catch (EOFException e) {
             return null; // End of stream
         }
@@ -41,7 +41,7 @@ public class AnimalInputStream extends InputStream {
         int raceLength = dis.readInt();
         byte[] raceBytes = new byte[raceLength];
         dis.readFully(raceBytes);
-        animalData.put("raça", new String(raceBytes, StandardCharsets.UTF_8));
+        animalData.put("raca", new String(raceBytes, StandardCharsets.UTF_8));
 
         return animalData;
     }
