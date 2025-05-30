@@ -1,4 +1,4 @@
-import controladores.Estoque;
+import entidades.controladores.Estoque;
 
 public class App {
     public static void main(String[] args) throws Exception {
