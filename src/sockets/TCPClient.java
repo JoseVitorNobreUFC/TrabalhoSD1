@@ -1,57 +1,33 @@
 package sockets;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 
 import entidades.dtos.*;
+import streams.ConsultaOutputStream;
 
 public class TCPClient {
-    private final String host;
-    private final int port;
+    public static void main(String[] args) throws Exception {
+        String host = "localhost";
+        int porta = 12345;
 
-    public TCPClient(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }
+        ArrayList<String> veterinarios = new ArrayList<>(Arrays.asList("Dr. João", "Dra. Maria"));
+        ArrayList<String> produtos = new ArrayList<>(Arrays.asList("Ração Premium", "Ração de Peixe"));
+        ArrayList<Date> agendamentos = new ArrayList<>(Arrays.asList(
+                new Date(),
+                new Date(System.currentTimeMillis() + 86400000)
+        ));
 
-    public void enviarConsultas(ConsultaDTO[] consultas) {
-        try (Socket socket = new Socket(host, port);
-             DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream())) {
+        ConsultaVeterinariaDTO consultaVet = new ConsultaVeterinariaDTO(veterinarios, 2, agendamentos);
+        ConsultaPetShopDTO consultaPet = new ConsultaPetShopDTO(produtos, 2, agendamentos);
+        ConsultaDTO[] consultas = new ConsultaDTO[]{consultaVet, consultaPet};
+        int quantidade = consultas.length;
 
-            System.out.println("Conectado ao servidor.");
-
-            // Enviar quantidade primeiro
-            dataOut.writeInt(consultas.length);
-
-            for (ConsultaDTO consulta : consultas) {
-                byte[] dados = consulta.toBytes();
-                dataOut.writeInt(dados.length);
-                dataOut.write(dados);
-            }
-            dataOut.flush();
-
-            System.out.println("Dados enviados com sucesso.");
-        } catch (IOException e) {
-            System.err.println("Erro ao enviar dados: " + e.getMessage());
+        try (Socket socket = new Socket(host, porta)) {
+            OutputStream saida = socket.getOutputStream();
+            new ConsultaOutputStream(consultas, quantidade, saida);
+            System.out.println(">>> Consultas enviadas ao servidor com sucesso.");
         }
-    }
-
-    public static void main(String[] args) {
-        ArrayList<String> vets = new ArrayList<>();
-        vets.add("Dr. Lucas");
-
-        ArrayList<String> produtos = new ArrayList<>();
-        produtos.add("Ração Premium");
-
-        ArrayList<Date> agendamentos = new ArrayList<>();
-        agendamentos.add(new Date());
-
-        ConsultaDTO[] consultas = new ConsultaDTO[2];
-        consultas[0] = new ConsultaVeterinariaDTO(vets, 1, agendamentos);
-        consultas[1] = new ConsultaPetShopDTO(produtos, 1, agendamentos);
-        new TCPClient("localhost", 5000).enviarConsultas(consultas);
     }
 }

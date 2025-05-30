@@ -12,12 +12,9 @@ public class ConsultaOutputStream extends OutputStream {
 
         DataOutputStream dataOut = new DataOutputStream(destino);
 
-        for (int i = 0; i < quantidade; i++) {
-            ConsultaDTO obj = objetos[i];
+        for (ConsultaDTO obj : objetos) {
             byte[] dados = obj.toBytes();
-            int tamanho = dados.length;
-
-            dataOut.writeInt(tamanho);
+            dataOut.writeInt(dados.length);
             dataOut.write(dados);
         }
 

@@ -4,8 +4,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 public class ConsultaVeterinariaDTO implements Serializable, ConsultaDTO {
     private ArrayList<String> veterinarios;
@@ -28,6 +31,61 @@ public class ConsultaVeterinariaDTO implements Serializable, ConsultaDTO {
 
     public ArrayList<Date> getAgendamentos() {
         return agendamentos;
+    }
+
+    public static ConsultaVeterinariaDTO fromBytes(byte[] dados) {
+        String texto = new String(dados, StandardCharsets.UTF_8);
+        String[] linhas = texto.split("\n");
+
+        if (!linhas[0].startsWith("VETERINARIA")) {
+            throw new IllegalArgumentException("Tipo inválido para ConsultaVeterinariaDTO");
+        }
+
+        ArrayList<String> veterinarios = new ArrayList<>();
+        
+        String veterinariosLinha = linhas[1].trim();
+        if (veterinariosLinha.startsWith("VETERINARIOS = [") && veterinariosLinha.endsWith("]")) {
+            String veterinariosStr = veterinariosLinha.substring("VETERINARIOS = [".length(), veterinariosLinha.length() - 1);
+            if (!veterinariosStr.isEmpty()) {
+                String[] veterinariosArray = veterinariosStr.split(",");
+                for (String vet : veterinariosArray) {
+                    veterinarios.add(vet.trim());
+                }
+            }
+        }
+
+        int quantidadeAnimais = 0;
+        ArrayList<Date> agendamentos = new ArrayList<>();
+
+        String quantidadeLinha = linhas[2].trim();
+        if (quantidadeLinha.startsWith("QUANTIDADE_ANIMAIS = ")) {
+            try {
+                quantidadeAnimais = Integer.parseInt(quantidadeLinha.substring("QUANTIDADE_ANIMAIS = ".length()));
+            } catch (NumberFormatException e) {
+                quantidadeAnimais = 0;
+            }
+        }
+
+        String agendamentosLinha = linhas[3].trim();
+        if (agendamentosLinha.startsWith("AGENDAMENTOS = [") && agendamentosLinha.endsWith("]")) {
+            String agendamentosStr = agendamentosLinha.substring("AGENDAMENTOS = [".length(), agendamentosLinha.length() - 1);
+            if (!agendamentosStr.isEmpty()) {
+                String[] agendamentosArray = agendamentosStr.split(",");
+
+                // Usa o mesmo formato do Date.toString()
+                SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+                for (String data : agendamentosArray) {
+                    try {
+                        agendamentos.add(sdf.parse(data.trim()));
+                    } catch (ParseException e) {
+                        // Opcional: imprimir/logar erro
+                        System.err.println("Erro ao converter data: " + data.trim());
+                    }
+                }
+            }
+        }
+
+        return new ConsultaVeterinariaDTO(veterinarios, quantidadeAnimais, agendamentos);
     }
 
     @Override

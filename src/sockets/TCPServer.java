@@ -3,41 +3,38 @@ package sockets;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
+
+import entidades.dtos.ConsultaDTO;
+import streams.ConsultaInputStream;
 
 public class TCPServer {
-    private static final int PORTA = 5000;
+    public static void main(String[] args) throws Exception {
+        int porta = 12345;
 
-    public static void main(String[] args) {
-        System.out.println("Servidor escutando na porta " + PORTA + "...");
-        try (ServerSocket serverSocket = new ServerSocket(PORTA)) {
+        try (ServerSocket servidor = new ServerSocket(porta)) {
+            System.out.println(">>> Servidor aguardando conexões na porta " + porta + "...");
+
             while (true) {
-                try (Socket socket = serverSocket.accept();
-                     DataInputStream dataIn = new DataInputStream(socket.getInputStream())) {
+                try (Socket cliente = servidor.accept()) {
+                    System.out.println(">>> Cliente conectado: " + cliente.getInetAddress());
 
-                    System.out.println("Cliente conectado.");
+                    InputStream entrada = cliente.getInputStream();
+                    ConsultaInputStream consultaIn = new ConsultaInputStream(entrada);
 
-                    // Ler quantidade de objetos
-                    int quantidade = dataIn.readInt();
-                    System.out.println("Quantidade de consultas a receber: " + quantidade);
-
-                    for (int i = 0; i < quantidade; i++) {
-                        int tamanho = dataIn.readInt();
-                        byte[] buffer = new byte[tamanho];
-                        dataIn.readFully(buffer);
-
-                        String conteudo = new String(buffer, StandardCharsets.UTF_8);
-                        System.out.println("Consulta #" + (i + 1) + ":");
-                        System.out.println(conteudo);
-                        System.out.println("---------------");
+                    try {
+                        ConsultaDTO[] consultasRecebidas = consultaIn.lerConsultas(2); // ou quantidade fixa
+                        System.out.println(">>> Começo da mensagem:");
+                        for (ConsultaDTO c : consultasRecebidas) {
+                            System.out.println(c);
+                            System.out.println("-----------");
+                        }
+                    } catch (IOException e) {
+                        System.err.println(">>> Erro ao ler consulta do cliente: " + e.getMessage());
                     }
 
-                } catch (IOException e) {
-                    System.err.println("Erro na conexão com cliente: " + e.getMessage());
+                    System.out.println(">>> Fim da mensagem.\n");
                 }
             }
-        } catch (IOException e) {
-            System.err.println("Erro ao iniciar servidor: " + e.getMessage());
         }
     }
 }
