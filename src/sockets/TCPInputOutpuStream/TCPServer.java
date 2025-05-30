@@ -1,4 +1,4 @@
-package sockets;
+package sockets.TCPInputOutpuStream;
 
 import java.io.*;
 import java.net.ServerSocket;
