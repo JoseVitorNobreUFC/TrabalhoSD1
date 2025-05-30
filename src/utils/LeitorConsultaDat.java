@@ -10,9 +10,9 @@ public class LeitorConsultaDat {
 
             int contador = 1;
             while (dataIn.available() > 0) {
-                int tamanho = dataIn.readInt(); // lê 4 bytes do tamanho
+                int tamanho = dataIn.readInt(); 
                 byte[] buffer = new byte[tamanho];
-                dataIn.readFully(buffer);       // lê exatamente 'tamanho' bytes
+                dataIn.readFully(buffer); 
 
                 String conteudo = new String(buffer, StandardCharsets.UTF_8);
                 System.out.println("Consulta #" + contador++);
