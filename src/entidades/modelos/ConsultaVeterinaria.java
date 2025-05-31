@@ -1,6 +1,9 @@
 package entidades.modelos;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import entidades.dtos.ConsultaRegistro;
 
 public class ConsultaVeterinaria extends ConsultaBase {
   private ArrayList<String> veterinarios;
@@ -8,6 +11,16 @@ public class ConsultaVeterinaria extends ConsultaBase {
   public ConsultaVeterinaria() {
     super();
     this.veterinarios = new ArrayList<>();
+  }
+
+  public ConsultaVeterinaria(List<ConsultaRegistro> historico) {
+    super();
+    this.veterinarios = new ArrayList<>();
+    if (historico != null && !historico.isEmpty()) {
+      for (ConsultaRegistro registro : historico) {
+          this.agendamentos.add(registro.getData());
+      }
+    }
   }
 
   public ArrayList<String> getVeterinarios() {

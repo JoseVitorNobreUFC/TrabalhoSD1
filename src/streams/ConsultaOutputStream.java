@@ -3,6 +3,8 @@ package streams;
 import java.io.*;
 
 import entidades.dtos.ConsultaDTO;
+import entidades.dtos.ReplyMessageDTO;
+import entidades.dtos.RequestMessageDTO;
 
 public class ConsultaOutputStream extends OutputStream {
     private final OutputStream destino;
@@ -19,6 +21,22 @@ public class ConsultaOutputStream extends OutputStream {
         }
 
         dataOut.flush();
+    }
+
+    public ConsultaOutputStream(OutputStream destino) {
+        this.destino = destino;
+    }
+
+    public void writeRequest(RequestMessageDTO request) throws IOException {
+        byte[] data = request.toBytes();
+        destino.write(data);
+        destino.flush();
+    }
+
+    public void writeReply(ReplyMessageDTO reply) throws IOException {
+        byte[] data = reply.toBytes();
+        destino.write(data);
+        destino.flush();
     }
 
     @Override

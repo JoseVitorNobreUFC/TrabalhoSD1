@@ -6,10 +6,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class CancelarConsultaRequestDTO {
+import entidades.dtos.RequestMessageDTO;
+
+public class CancelarConsultaRequestDTO extends RequestMessageDTO {
     private int id;
 
     public CancelarConsultaRequestDTO(int id) {
+        super("cancelarConsulta", id, null, null);
         this.id = id;
     }
 

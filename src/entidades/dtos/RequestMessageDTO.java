@@ -1,56 +1,81 @@
 package entidades.dtos;
 
-import java.io.Serializable;
-
 import java.io.*;
+import java.util.Date;
+
+import entidades.interfaces.Consulta;
 
 public class RequestMessageDTO implements Serializable {
-    private int operationId; 
-    private Object payload; 
+    private String operacao; // "realizarConsulta", "cancelarConsulta", "getMedicamentos"
+    private int idConsulta;
+    private Date dataConsulta;
+    private String nomeAnimal;
 
-    public RequestMessageDTO(int operationId, Object payload) {
-        this.operationId = operationId;
-        this.payload = payload;
+    public RequestMessageDTO(String operacao, int idConsulta, Date dataConsulta, String nomeAnimal) {
+        this.operacao = operacao;
+        this.idConsulta = idConsulta;
+        this.dataConsulta = dataConsulta;
+        this.nomeAnimal = nomeAnimal;
     }
 
-    public int getOperationId() {
-        return operationId;
+    public static RequestMessageDTO novaConsulta(Date data) {
+        return new RequestMessageDTO("realizarConsulta", -1, data, null);
     }
 
-    public Object getPayload() {
-        return payload;
+    public static RequestMessageDTO cancelarConsulta(int id) {
+        return new RequestMessageDTO("cancelarConsulta", id, null, null);
+    }
+
+    public static RequestMessageDTO getMedicamentos(String animal) {
+        return new RequestMessageDTO("getMedicamentos", -1, null, animal);
     }
 
     public byte[] toBytes() throws IOException {
-        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        DataOutputStream dataOut = new DataOutputStream(byteOut);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(baos);
 
-        dataOut.writeInt(operationId); // 4 bytes
+        out.writeUTF(operacao);
+        out.writeInt(idConsulta);
+        out.writeLong(dataConsulta != null ? dataConsulta.getTime() : -1L);
+        out.writeBoolean(nomeAnimal != null);
+        if (nomeAnimal != null) out.writeUTF(nomeAnimal);
 
-        // Serializa o payload
-        ByteArrayOutputStream payloadOut = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(payloadOut);
-        oos.writeObject(payload);
-        oos.flush();
-        byte[] payloadBytes = payloadOut.toByteArray();
-
-        dataOut.writeInt(payloadBytes.length); // tamanho do payload
-        dataOut.write(payloadBytes); // conteúdo serializado
-
-        return byteOut.toByteArray();
+        return baos.toByteArray();
     }
 
-    public static RequestMessageDTO fromInputStream(InputStream in) throws IOException, ClassNotFoundException {
-        DataInputStream dataIn = new DataInputStream(in);
+    public static RequestMessageDTO fromBytes(InputStream input) throws IOException {
+        DataInputStream in = new DataInputStream(input);
 
-        int operationId = dataIn.readInt(); // lê operação
-        int payloadLength = dataIn.readInt(); // lê tamanho do payload
-        byte[] payloadBytes = new byte[payloadLength];
-        dataIn.readFully(payloadBytes); // lê os bytes do payload
+        String operacao = in.readUTF();
+        int id = in.readInt();
+        long timestamp = in.readLong();
+        Date data = timestamp >= 0 ? new Date(timestamp) : null;
 
-        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(payloadBytes));
-        Object payload = ois.readObject();
+        String animal = null;
+        if (in.readBoolean()) {
+            animal = in.readUTF();
+        }
 
-        return new RequestMessageDTO(operationId, payload);
+        return new RequestMessageDTO(operacao, id, data, animal);
+    }
+
+    public ReplyMessageDTO processar(Consulta servico) {
+        try {
+            switch (operacao) {
+                case "realizarConsulta":
+                    servico.realizarConsulta(dataConsulta);
+                    return new ReplyMessageDTO("Consulta realizada com sucesso.");
+                case "cancelarConsulta":
+                    servico.cancelarConsulta(idConsulta);
+                    return new ReplyMessageDTO("Consulta cancelada com sucesso.");
+                case "getMedicamentos":
+                    var mapa = servico.getMedicamentos(nomeAnimal);
+                    return new ReplyMessageDTO("Medicamentos: " + mapa.toString());
+                default:
+                    return new ReplyMessageDTO("Operação desconhecida.");
+            }
+        } catch (Exception e) {
+            return new ReplyMessageDTO("Erro ao processar: " + e.getMessage());
+        }
     }
 }

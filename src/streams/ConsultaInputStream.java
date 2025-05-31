@@ -7,6 +7,8 @@ import java.io.DataInputStream;
 import entidades.dtos.ConsultaDTO;
 import entidades.dtos.ConsultaPetShopDTO;
 import entidades.dtos.ConsultaVeterinariaDTO;
+import entidades.dtos.ReplyMessageDTO;
+import entidades.dtos.RequestMessageDTO;
 
 public class ConsultaInputStream extends InputStream {
     private final InputStream origem;
@@ -41,4 +43,13 @@ public class ConsultaInputStream extends InputStream {
     public int read() throws IOException {
         return origem.read();
     }
+
+    public RequestMessageDTO readRequest() throws IOException {
+        return RequestMessageDTO.fromBytes(origem);
+    }
+
+    public ReplyMessageDTO readReply() throws IOException {
+        return ReplyMessageDTO.fromBytes(origem);
+    }
+
 }

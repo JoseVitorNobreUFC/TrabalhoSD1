@@ -7,10 +7,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-public class RealizarConsultaRequestDTO {
+import entidades.dtos.RequestMessageDTO;
+
+public class RealizarConsultaRequestDTO extends RequestMessageDTO {
     private long timestamp;
 
     public RealizarConsultaRequestDTO(Date data) {
+        super("realizarConsulta", -1, data, null);
         this.timestamp = data.getTime();
     }
 

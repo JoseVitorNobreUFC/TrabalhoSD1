@@ -6,10 +6,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class GetMedicamentosRequestDTO {
+import entidades.dtos.RequestMessageDTO;
+
+public class GetMedicamentosRequestDTO extends RequestMessageDTO {
     private String animal;
 
     public GetMedicamentosRequestDTO(String animal) {
+        super("getMedicamentos", -1, null, animal);
         this.animal = animal;
     }
 

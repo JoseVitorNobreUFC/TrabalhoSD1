@@ -10,7 +10,7 @@ import entidades.enums.TipoRequisicao;
 
 public class ConsultaRequest {
     private TipoRequisicao tipo;
-    private byte[] dados; // dados serializados específicos do tipo de request
+    private byte[] dados;
 
     public ConsultaRequest(TipoRequisicao tipo, byte[] dados) {
         this.tipo = tipo;
